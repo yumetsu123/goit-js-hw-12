@@ -21,7 +21,6 @@ let data;
 
 const renderResult = async (query, page) => {
   showLoader();
-  showLoadMoreButton(loadMoreButton);
   try {
     data = await getImagesByQuery(query, page);
     if (data.hits.length === 0) {
@@ -29,13 +28,19 @@ const renderResult = async (query, page) => {
           message:
             'Sorry, there are no images matching your search query. Please try again!',
           position: 'topRight',
-        });
+      });
+      
+      return;
     }    
 
     createGallery(data.hits);
   }
-  catch (error) {
-    console.log('Error: ', error.message);
+  catch (err) {
+    iziToast.error({
+          message:
+            'Sorry, something went wrong',
+          position: 'topRight',
+      });
   }
 
   finally {
@@ -44,20 +49,26 @@ const renderResult = async (query, page) => {
 
 }
 
-form.addEventListener('submit', e => {
+form.addEventListener('submit', async e => {
   e.preventDefault();
+  page = 1;
   const formData = new FormData(e.currentTarget);
   query = formData.get('search-text').trim();
   if (!query) {
     return;
   }
   clearGallery();
-  renderResult(query, 1)
+  await renderResult(query, 1);
+  showLoadMoreButton(loadMoreButton);
   e.currentTarget.reset();
 });
 
 const scrollAfterClickLoadMore = () => {
   const item = document.querySelector('.gallery-item');
+
+  if (!item) {
+    return;
+  }
 
   const itemHeight = item.getBoundingClientRect().height;
 
@@ -70,7 +81,7 @@ const scrollAfterClickLoadMore = () => {
 loadMoreButton.addEventListener('click', async () => {
   const maxPages = Math.ceil(data.totalHits / 15);
   
-  if (page > maxPages) {
+  if (page >= maxPages) {
     hideLoadMoreButton(loadMoreButton);
     iziToast.error({
           message:
