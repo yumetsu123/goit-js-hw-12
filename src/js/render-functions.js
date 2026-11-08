@@ -49,3 +49,11 @@ export const showLoader = () => {
 export const hideLoader = () => {
   loader.classList.add('hidden');
 };
+
+export const showLoadMoreButton = (button) => {
+  button.classList.remove('hidden');
+}
+
+export const hideLoadMoreButton = (button) => {
+  button.classList.add('hidden');
+}

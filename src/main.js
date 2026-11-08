@@ -8,48 +8,78 @@ import {
   clearGallery,
   showLoader,
   hideLoader,
+  showLoadMoreButton,
+  hideLoadMoreButton
 } from './js/render-functions.js';
 
 const form = document.querySelector('.form');
+const loadMoreButton = document.querySelector('.btn-load-more');
 
-form.addEventListener('submit', event => {
-  event.preventDefault();
+let query;
+let page = 1;
+let data;
 
-  const query = event.currentTarget.elements['search-text'].value.trim();
-
-  clearGallery();
-
-  if (!query) {
-    return;
-  }
-
+const renderResult = async (query, page) => {
   showLoader();
-
-  getImagesByQuery(query)
-    .then(data => {
-      if (data.hits.length === 0) {
-        iziToast.error({
+  showLoadMoreButton(loadMoreButton);
+  try {
+    data = await getImagesByQuery(query, page);
+    if (data.hits.length === 0) {
+      iziToast.error({
           message:
             'Sorry, there are no images matching your search query. Please try again!',
           position: 'topRight',
         });
+    }    
 
-        return;
-      }
+    createGallery(data.hits);
+  }
+  catch (error) {
+    console.log('Error: ', error.message);
+  }
 
-      createGallery(data.hits);
-    })
-    .catch(error => {
-      iziToast.error({
-        message: 'Something went wrong. Please try again later!',
-        position: 'topRight',
-      });
+  finally {
+    hideLoader();
+  }
 
-      console.error('Request error:', error);
-    })
-    .finally(() => {
-      hideLoader();
-    });
+}
 
-  event.currentTarget.reset();
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const formData = new FormData(e.currentTarget);
+  query = formData.get('search-text').trim();
+  if (!query) {
+    return;
+  }
+  clearGallery();
+  renderResult(query, 1)
+  e.currentTarget.reset();
 });
+
+const scrollAfterClickLoadMore = () => {
+  const item = document.querySelector('.gallery-item');
+
+  const itemHeight = item.getBoundingClientRect().height;
+
+  scrollBy({
+    top: itemHeight * 2,
+    behavior: "smooth",
+  })
+}
+
+loadMoreButton.addEventListener('click', async () => {
+  const maxPages = Math.ceil(data.totalHits / 15);
+  
+  if (page > maxPages) {
+    hideLoadMoreButton(loadMoreButton);
+    iziToast.error({
+          message:
+            "We're sorry, but you've reached the end of search results",
+          position: 'topRight',
+    });
+    return;
+  }
+  page++;
+  await renderResult(query, page);
+  scrollAfterClickLoadMore();
+})
