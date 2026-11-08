@@ -2,46 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vanilla-app-template/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vanilla App Template</title>
+    <title>Image Search</title>
     <script type="module" crossorigin src="/vanilla-app-template/index.js"></script>
     <link rel="modulepreload" crossorigin href="/vanilla-app-template/assets/vendor-BX8YMJUK.js">
     <link rel="stylesheet" crossorigin href="/vanilla-app-template/assets/vendor-DumFYO8Z.css">
     <link rel="stylesheet" crossorigin href="/vanilla-app-template/assets/index-C-4O5pRP.css">
   </head>
+
   <body>
-    <body>
-      <!doctype html>
-      <html lang="en">
-        <head>
-          <meta charset="UTF-8" />
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0"
-          />
-          <title>Image Search</title>
-        </head>
+    <form class="form">
+      <input type="text" name="search-text" placeholder="Search images..." />
 
-        <body>
-          <form class="form">
-            <input
-              type="text"
-              name="search-text"
-              placeholder="Search images..."
-            />
+      <button type="submit">Search</button>
+    </form>
+    <ul class="gallery"></ul>
+    <button class="btn-load-more hidden" type="button">Load more</button>
 
-            <button type="submit">Search</button>
-          </form>
-          <ul class="gallery"></ul>
-          <button class="btn-load-more hidden" type="button">Load more</button>
+    <div class="loader hidden">
+      <span class="loader-spinner"></span>
+    </div>
 
-          <div class="loader hidden">
-            <span class="loader-spinner"></span>
-          </div>
-
-        </body>
-      </html>
-    </body>
   </body>
 </html>
