@@ -20,6 +20,7 @@ let page = 1;
 let data;
 
 const renderResult = async (query, page) => {
+  hideLoadMoreButton(loadMoreButton);
   showLoader();
   try {
     data = await getImagesByQuery(query, page);
@@ -29,11 +30,21 @@ const renderResult = async (query, page) => {
             'Sorry, there are no images matching your search query. Please try again!',
           position: 'topRight',
       });
-      
       return;
     }    
 
     createGallery(data.hits);
+
+    const maxPages = Math.ceil(data.totalHits / 15);
+    if (page >= maxPages) {
+      hideLoadMoreButton(loadMoreButton);
+      iziToast.info({
+        message: "We're sorry, but you've reached the end of search results",
+        position: 'topRight',
+      });
+    } else {
+      showLoadMoreButton(loadMoreButton);
+    }
   }
   catch (err) {
     iziToast.error({
@@ -59,7 +70,6 @@ form.addEventListener('submit', async e => {
   }
   clearGallery();
   await renderResult(query, 1);
-  showLoadMoreButton(loadMoreButton);
   e.currentTarget.reset();
 });
 
@@ -79,17 +89,6 @@ const scrollAfterClickLoadMore = () => {
 }
 
 loadMoreButton.addEventListener('click', async () => {
-  const maxPages = Math.ceil(data.totalHits / 15);
-  
-  if (page >= maxPages) {
-    hideLoadMoreButton(loadMoreButton);
-    iziToast.error({
-          message:
-            "We're sorry, but you've reached the end of search results",
-          position: 'topRight',
-    });
-    return;
-  }
   page++;
   await renderResult(query, page);
   scrollAfterClickLoadMore();
